@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Quiz: Verb To Be</title>
+    <style>
+        /* --- ESTILOS GERAIS (Tema Dark Neon) --- */
+        body {
+            font-family: 'Courier New', Courier, monospace; /* Fonte estilo terminal */
+            background-color: #000000; /* Fundo Preto */
+            color: #ffffff;
+            display: flex;
+            flex-direction: column; /* Alinha itens verticalmente */
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Estilo para a imagem do topo */
+        .top-banner {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            display: block;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); /* Brilho Ciano opcional */
+        }
+
+        .quiz-container {
+            background-color: #111; /* Cinza quase preto para o cartão */
+            width: 90%; /* Largura responsiva */
+            max-width: 500px;
+            padding: 30px;
+            border: 2px solid #00FFFF; /* Borda Ciano */
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); /* Brilho Ciano */
+            position: relative;
+            overflow: hidden;
+            margin-top: 20px; /* Espaço entre a imagem e o quiz */
+            margin-bottom: 20px; /* Espaço inferior */
+        }
+
+        h1 {
+            text-align: center;
+            color: #00FFFF; /* Título Ciano */
+            text-shadow: 0 0 5px #00FFFF;
+            margin-bottom: 20px;
+        }
+
+        /* Barra de Progresso */
+        .progress-container {
+            width: 100%;
+            background-color: #333;
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #00FF7F; /* Verde Primavera */
+            width: 0%;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px #00FF7F;
+        }
+
+        /* --- QUESTÕES --- */
+        .question-step {
+            display: none; /* Esconde todas por padrão */
+            animation: slideIn 0.4s ease;
+        }
+
+        .question-step.active {
+            display: block; /* Mostra a atual */
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #00FF7F; /* Texto da pergunta em Verde */
+            font-weight: bold;
+        }
+
+        /* Opções Customizadas */
+        .options label {
+            display: block;
+            padding: 12px;
+            margin-bottom: 10px;
+            background-color: #000000;
+            border: 1px solid #333;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #fff;
+        }
+
+        .options label:hover {
+            border-color: #00FFFF;
+            box-shadow: 0 0 8px #00FFFF;
+        }
+
+        /* Estilo quando o radio está selecionado */
+        .options input[type="radio"] {
+            accent-color: #00FF7F;
+            margin-right: 10px;
+        }
+
+        .options input[type="radio"]:checked + span {
+            color: #00FF7F;
+            font-weight: bold;
+            text-shadow: 0 0 5px #00FF7F;
+        }
+        
+        /* Realce da label pai quando selecionada (via JS ou CSS has se suportado) */
+        .options label.selected {
+            border-color: #00FF7F;
+            background-color: rgba(0, 255, 127, 0.1);
+        }
+
+        /* --- BOTÕES --- */
+        .btn-action {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background-color: #00FFFF; /* Fundo Ciano */
+            color: #000000; /* Texto Preto */
+            font-weight: bold;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-action:hover {
+            background-color: #00FF7F; /* Muda para Verde no hover */
+            box-shadow: 0 0 15px #00FF7F;
+            transform: scale(1.02);
+        }
+
+        /* --- RESULTADOS --- */
+        #result-area {
+            display: none;
+            text-align: center;
+        }
+
+        .score-box {
+            border: 2px dashed #00FFFF;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+
+        .final-score {
+            font-size: 3em;
+            color: #00FF7F;
+            text-shadow: 0 0 10px #00FF7F;
+        }
+
+        table {
+            width: 100%;
+            color: #fff;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 10px;
+        }
+        th {
+            color: #00FFFF;
+        }
+
+        /* Explicações ao final */
+        .review-list {
+            text-align: left;
+            margin-top: 20px;
+        }
+        .review-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-bottom: 1px solid #333;
+        }
+        .review-correct { color: #00FF7F; }
+        .review-wrong { color: #ff4444; } /* Vermelho para erro no final */
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+
+<img src="image_0.png" alt="Banner Neon Quiz" class="top-banner">
+
+<div class="quiz-container">
+    <h1>VERB TO BE_</h1>
+    
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <form id="quiz-form">
+        
+        <div class="question-step active">
+            <p class="question-text">1/5. She _____ my best friend.</p>
+            <div class="options">
+                <label onclick="selectOption(this)"><input type="radio" name="q1" value="are"> <span>are</span></label>
+                <label onclick="selectOption(this)"><input type="radio" name="q1" value="am"> <span>am</span></label>
+                <label onclick="selectOption(this)"><input type="radio" name="q1" value="is"> <span>is</span></label>
+            </div>
+        </div>
+
+        <div class="question-step">
+            <p class="question-text">2/5. They _____ at home right now.</p>
+            <div class="options">
+                <label onclick="selectOption(this)"><input type="radio" name="q2" value="is"> <span>is</span></label>
+                <label onclick="selectOption(this)"><input type="radio" name="q2" value="are"> <span>are</span></label>
+                <label onclick="selectOption(this)"><input type="radio" name="q2" value="am"> <span>am</span></label>
+            </div>
+        </div>
+
+        <div class="question-step">
+            <p class="question-text">3/5. I _____ very hungry.</p>
+            <div class="options">
+                <label onclick="selectOption(this)"><input type="radio" name="q3" value="am"> <span>am</span></label>
+                <label onclick="selectOption(this)"><input type="radio" name="q3" value="is"> <span>is</span></label>
+                <label onclick="selectOption(this)"><input type="radio" name="q3" value="are"> <span>are</span></label>
+            </div>
+        </div>
+
+        <div class="question-step">
+            <p class="question-text">4/5. _____ you from Brazil?</p>
+            <div class="options">
+                <label onclick="selectOption(this)"><input type="radio" name="q4" value="Is"> <span>Is</span></label>
+                <label onclick="selectOption(this)"><input type="radio" name="q4" value="Am"> <span>Am</span></label>
+                <label onclick="selectOption(this)"><input type="radio" name="q4" value="Are"> <span>Are</span></label>
+            </div>
+        </div>
+
+        <div class="question-step">
+            <p class="question-text">5/5. It _____ a beautiful day.</p>
+            <div class="options">
+                <label onclick="selectOption(this)"><input type="radio" name="q5" value="are"> <span>are</span></label>
+                <label onclick="selectOption(this)"><input type="radio" name="q5" value="is"> <span>is</span></label>
+                <label onclick="selectOption(this)"><input type="radio" name="q5" value="am"> <span>am</span></label>
+            </div>
+        </div>
+
+        <button type="button" id="next-btn" class="btn-action" onclick="nextQuestion()">PRÓXIMA ></button>
+
+    </form>
+
+    <div id="result-area">
+        <h2 style="color: #00FFFF">SYSTEM REPORT</h2>
+        
+        <div class="score-box">
+            <div class="final-score" id="score-percent">0%</div>
+            <p>TAXA DE ACERTO</p>
+        </div>
+
+        <table>
+            <tr>
+                <th>ACERTOS</th>
+                <td id="score-correct" style="color: #00FF7F">0</td>
+            </tr>
+            <tr>
+                <th>ERROS</th>
+                <td id="score-wrong" style="color: #ff4444">0</td>
+            </tr>
+        </table>
+
+        <div class="review-list" id="review-container">
+            </div>
+
+        <button class="btn-action" onclick="location.reload()">REINICIAR SISTEMA</button>
+    </div>
+
+</div>
+
+<script>
+    let currentStep = 0;
+    const steps = document.querySelectorAll('.question-step');
+    const nextBtn = document.getElementById('next-btn');
+    const progressBar = document.getElementById('progress-bar');
+    const totalQuestions = steps.length;
+
+    // Atualiza barra de progresso inicial
+    updateProgress();
+
+    function selectOption(label) {
+        // Remove classe 'selected' de todos os irmãos
+        const optionsDiv = label.parentElement;
+        const labels = optionsDiv.querySelectorAll('label');
+        labels.forEach(l => l.classList.remove('selected'));
+        // Adiciona ao clicado
+        label.classList.add('selected');
+    }
+
+    function updateProgress() {
+        const percent = ((currentStep) / totalQuestions) * 100;
+        progressBar.style.width = percent + "%";
+    }
+
+    function nextQuestion() {
+        // Verifica se respondeu a atual
+        const currentQName = 'q' + (currentStep + 1);
+        const selected = document.querySelector(`input[name="${currentQName}"]:checked`);
+        
+        if (!selected) {
+            alert("⚠️ Por favor, selecione uma opção.");
+            return;
+        }
+
+        // Esconde atual
+        steps[currentStep].classList.remove('active');
+        
+        // Incrementa
+        currentStep++;
+        updateProgress();
+
+        if (currentStep < totalQuestions) {
+            // Mostra próxima
+            steps[currentStep].classList.add('active');
+            
+            // Se for a última pergunta, muda o texto do botão
+            if (currentStep === totalQuestions - 1) {
+                nextBtn.innerText = "FINALIZAR & VER SCORE";
+                nextBtn.style.backgroundColor = "#00FF7F"; // Botão fica verde no final
+            }
+        } else {
+            // Acabou - Processar
+            finishQuiz();
+        }
+    }
+
+    function finishQuiz() {
+        nextBtn.style.display = 'none'; // Esconde botão
+        progressBar.style.width = "100%"; // Completa barra
+        
+        // GABARITO E EXPLICAÇÕES
+        const answersData = [
+            { id: 'q1', correct: 'is', text: "She _____ my best friend.", explanation: "Usamos 'is' para She/He/It." },
+            { id: 'q2', correct: 'are', text: "They _____ at home.", explanation: "Usamos 'are' para They/We/You." },
+            { id: 'q3', correct: 'am', text: "I _____ very hungry.", explanation: "O pronome 'I' sempre usa 'am'." },
+            { id: 'q4', correct: 'Are', text: "_____ you from Brazil?", explanation: "Em perguntas com 'you', usamos 'Are' no início." },
+            { id: 'q5', correct: 'is', text: "It _____ a beautiful day.", explanation: "Usamos 'is' para 'It' (objetos/tempo)." }
+        ];
+
+        let score = 0;
+        let reviewHTML = "<h3>Gabarito:</h3>";
+
+        answersData.forEach((item, index) => {
+            const selected = document.querySelector(`input[name="${item.id}"]:checked`).value;
+            const isCorrect = selected === item.correct;
+            
+            if (isCorrect) score++;
+
+            reviewHTML += `
+                <div class="review-item">
+                    <div style="font-weight:bold;">${index + 1}. ${item.text}</div>
+                    <div>Sua resposta: <span class="${isCorrect ? 'review-correct' : 'review-wrong'}">${selected}</span></div>
+                    ${!isCorrect ? `<div style="color:#00FF7F; font-size:0.9em;">Correto: ${item.correct}</div>` : ''}
+                    <div style="font-size: 0.85em; color: #ccc; margin-top:4px;">Isso ocorre porque: ${item.explanation}</div>
+                </div>
+            `;
+        });
+
+        // Popula dados
+        document.getElementById('score-correct').innerText = score;
+        document.getElementById('score-wrong').innerText = totalQuestions - score;
+        document.getElementById('score-percent').innerText = Math.round((score / totalQuestions) * 100) + "%";
+        document.getElementById('review-container').innerHTML = reviewHTML;
+
+        // Mostra resultado
+        document.getElementById('result-area').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
